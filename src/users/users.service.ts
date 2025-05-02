@@ -44,4 +44,17 @@ export class UsersService {
       data: updateUser,
     });
   }
+
+  async validatePassword(
+    email: string,
+    password: string,
+  ): Promise<{ valid: boolean }> {
+    const result = await this.prisma.$queryRaw<{ valid: boolean }[]>`
+      SELECT COUNT(*) > 0 as valid
+      FROM "User"
+      WHERE email = ${email} AND password = crypt(${password}, password)
+    `;
+
+    return result[0];
+  }
 }

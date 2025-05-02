@@ -11,6 +11,15 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Post('login')
+  login(@Body() data: { email: string; password: string }) {
+    const { email, password } = data;
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+    return this.usersService.validatePassword(email, password);
+  }
+
   @Get()
   findAll() {
     return this.usersService.findAll();
