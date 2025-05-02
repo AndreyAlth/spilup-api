@@ -7,9 +7,23 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUser: User) {
-    return this.prisma.user.create({
-      data: createUser,
-    });
+    // return this.prisma.user.create({
+    //   data: createUser,
+    // });
+    const res = await this.prisma.$queryRaw<User>`
+    INSERT INTO "User" (id, name, "last_name", email, password, "createdAt", "updatedAt")
+    VALUES (
+      gen_random_uuid(), 
+      ${createUser.name}, 
+      ${createUser.last_name}, 
+      ${createUser.email}, 
+      crypt(${createUser.password}, gen_salt('md5')), 
+      NOW(), 
+      NOW()
+    )
+    RETURNING id, name, "last_name", email, "createdAt", "updatedAt"
+  `;
+    return res;
   }
 
   findAll() {
