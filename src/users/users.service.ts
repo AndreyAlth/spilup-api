@@ -29,12 +29,28 @@ export class UsersService {
   findAll() {
     return this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        last_name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
   findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        last_name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -42,6 +58,14 @@ export class UsersService {
     return this.prisma.user.update({
       where: { id },
       data: updateUser,
+      select: {
+        id: true,
+        name: true,
+        last_name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
