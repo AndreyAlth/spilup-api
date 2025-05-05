@@ -25,11 +25,12 @@ export class AuthController {
       }
 
       const user = await this.usersService.findByEmail(email);
+      console.log(user);
       if (!user) {
         throw new Error('User not found');
       }
-
-      return this.usersService.validatePassword(email, password);
+      const isValid = await this.usersService.validatePassword(email, password);
+      return res.json(isValid);
     } catch (error: unknown) {
       res.status(400).json({
         message: 'Login failed',
