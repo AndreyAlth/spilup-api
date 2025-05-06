@@ -20,17 +20,13 @@ export class AuthController {
   ) {
     try {
       const { email, password } = data;
+
       if (!email || !password) {
         throw new Error('Email and password are required');
       }
 
-      const user = await this.usersService.findByEmail(email);
-      console.log(user);
-      if (!user) {
-        throw new Error('User not found');
-      }
-      const isValid = await this.usersService.validatePassword(email, password);
-      return res.json(isValid);
+      const token = await this.authService.get_token(email, password);
+      return res.json({ token });
     } catch (error: unknown) {
       res.status(400).json({
         message: 'Login failed',
