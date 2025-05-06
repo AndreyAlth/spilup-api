@@ -3,6 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtPayloadUser } from './auth.interface';
 import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
   ) {}
 
   async get_token(email: string, password: string) {
-    if (!(typeof process.env.JWT_SECTRET == 'string')) {
+    if (!(typeof jwtConstants.secret == 'string')) {
       throw new Error('Forgot to set SECRET env variable');
     }
 
@@ -34,7 +35,7 @@ export class AuthService {
     const token2 = this.jwtService.sign(
       { email: user.email, token1 },
       {
-        secret: process.env.JWT_SECTRET,
+        secret: jwtConstants.secret,
         expiresIn: '8h',
       },
     );
@@ -42,7 +43,7 @@ export class AuthService {
   }
 
   async decode_token(token: string) {
-    if (!(typeof process.env.JWT_SECTRET == 'string')) {
+    if (!(typeof jwtConstants.secret == 'string')) {
       throw new Error('Forgot to set SECRET env variable');
     }
 
@@ -53,8 +54,4 @@ export class AuthService {
     }
     return jwt.verify(decoded2.token1, user.email);
   }
-
-  // async verify_token(token: string) {
-
-  // }
 }
