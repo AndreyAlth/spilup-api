@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Auth } from './auth.interface';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'generated/prisma';
 import { Response } from 'express';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +42,11 @@ export class AuthController {
     data: User,
   ) {
     return this.usersService.create(data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('me')
+  me() {
+    return 'ruta protegida';
   }
 }
