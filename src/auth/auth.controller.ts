@@ -25,8 +25,8 @@ export class AuthController {
         throw new Error('Email and password are required');
       }
 
-      const token = await this.authService.get_token(email, password);
-      return res.json({ token });
+      const { user, token } = await this.authService.get_token(email, password);
+      return res.json({ user, token });
     } catch (error: unknown) {
       res.status(400).json({
         message: 'Login failed',
