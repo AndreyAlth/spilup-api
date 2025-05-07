@@ -20,7 +20,18 @@ model User {
   name      String
   last_name  String
   email     String  @unique
-  password  String  
+  password  String 
+  apiKeys   Apikey[] 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Apikey {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  key       String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
