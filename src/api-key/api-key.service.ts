@@ -4,6 +4,7 @@ import { UpdateApiKeyDto } from './dto/update-api-key.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as crypto from 'crypto'
 import { PublicApiKeyDto } from './dto/api-key.dto'
+import { Apikey } from 'generated/prisma'
 
 @Injectable()
 export class ApiKeyService {
@@ -14,7 +15,7 @@ export class ApiKeyService {
     return crypto.randomBytes(32).toString('hex')
   }
 
-  async create(createApiKeyDto: CreateApiKeyDto): Promise<PublicApiKeyDto> {
+  async create(createApiKeyDto: CreateApiKeyDto): Promise<Apikey> {
     const apiKey = this.prisma.apikey.create({
       data: {
         name: createApiKeyDto.name,
@@ -24,6 +25,8 @@ export class ApiKeyService {
       select: {
         id: true,
         name: true,
+        key: true,
+        userId: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -48,9 +51,9 @@ export class ApiKeyService {
     return apikeys
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, userId: string): Promise<PublicApiKeyDto> {
     const apiKey = await this.prisma.apikey.findUnique({
-      where: { id },
+      where: { id, userId },
       select: {
         id: true,
         name: true,

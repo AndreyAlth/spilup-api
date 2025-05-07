@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common'
 import { ApiKeyService } from './api-key.service'
 import { CreateApiKeyDto } from './dto/create-api-key.dto'
 import { UpdateApiKeyDto } from './dto/update-api-key.dto'
@@ -18,17 +18,17 @@ export class ApiKeyController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.apiKeyService.findOne(id)
+  findOne(@Param('id') id: string, @Query('userId') userId: string) {
+    return this.apiKeyService.findOne(id, userId)
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateApiKeyDto: UpdateApiKeyDto) {
-    return this.apiKeyService.update(+id, updateApiKeyDto)
+    return this.apiKeyService.update(id, updateApiKeyDto)
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.apiKeyService.remove(+id)
+    return this.apiKeyService.remove(id)
   }
 }

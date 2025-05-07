@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from 'generated/prisma';
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from '../prisma/prisma.service'
+import { User } from 'generated/prisma'
 
 @Injectable()
 export class UsersService {
@@ -22,8 +22,8 @@ export class UsersService {
       NOW()
     )
     RETURNING id, name, "last_name", email, "createdAt", "updatedAt"
-  `;
-    return res;
+  `
+    return res
   }
 
   findAll() {
@@ -38,7 +38,7 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
       },
-    });
+    })
   }
 
   findOne(id: string) {
@@ -52,7 +52,7 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
       },
-    });
+    })
   }
 
   update(id: string, updateUser: User) {
@@ -67,20 +67,17 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
       },
-    });
+    })
   }
 
-  async validatePassword(
-    email: string,
-    password: string,
-  ): Promise<{ valid: boolean }> {
+  async validatePassword(email: string, password: string): Promise<{ valid: boolean }> {
     const result = await this.prisma.$queryRaw<{ valid: boolean }[]>`
       SELECT COUNT(*) > 0 as valid
       FROM "User"
       WHERE email = ${email} AND password = crypt(${password}, password)
-    `;
+    `
 
-    return result[0];
+    return result[0]
   }
 
   async findByEmail(email: string): Promise<Omit<User, 'password'> | null> {
@@ -94,7 +91,7 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
       },
-    });
-    return user;
+    })
+    return user
   }
 }
