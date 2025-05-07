@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
-import { UsersService } from './users.service';
-import { User } from 'generated/prisma';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common'
+import { UsersService } from './users.service'
+import { User } from 'generated/prisma'
+import { AuthGuard } from 'src/auth/auth.guard'
 
 @Controller('users')
 export class UsersController {
@@ -17,7 +9,7 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: User) {
-    return this.usersService.create(createUserDto);
+    return this.usersService.create(createUserDto)
   }
 
   // @Get()
@@ -28,12 +20,12 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    return this.usersService.findOne(id)
   }
 
   @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: User) {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto)
   }
 }
