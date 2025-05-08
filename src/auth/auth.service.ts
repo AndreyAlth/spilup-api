@@ -26,14 +26,14 @@ export class AuthService {
     if (!valid) throw new UnauthorizedException()
 
     const token1 = this.jwtService.sign(
-      { email: user.email },
+      { email: user.email, userId: user.id },
       {
         secret: user.email,
         expiresIn: '8h',
       },
     )
     const token2 = this.jwtService.sign(
-      { email: user.email, token1 },
+      { email: user.email, userId: user.id, token1 },
       {
         secret: jwtConstants.secret,
         expiresIn: '8h',
