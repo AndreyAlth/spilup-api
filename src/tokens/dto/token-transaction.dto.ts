@@ -8,7 +8,7 @@ export class TokenTransactionDto {
 
   @IsNotEmpty()
   @IsNumber()
-  amount: Float32Array
+  amount: number
 
   @IsNotEmpty()
   type: TokenType
