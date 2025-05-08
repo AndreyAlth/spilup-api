@@ -16,14 +16,16 @@ datasource db {
 
 //Models
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  last_name  String
-  email     String  @unique
-  password  String 
-  apiKeys   Apikey[] 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String              @id @default(uuid()) @db.Uuid
+  name               String
+  last_name          String
+  email              String              @unique
+  password           String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  apiKeys            Apikey[]
+  token_balances     Token_balance[]
+  token_transactions Token_transaction[]
 }
 
 model Apikey {
@@ -34,4 +36,36 @@ model Apikey {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Token_balance {
+  id        String   @id @default(uuid()) @db.Uuid
+  amount    Float
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Transaction_type {
+  GENERATED
+  PURCHASED
+  TRANSFERRED_IN
+  TRANSFERRED_OUT
+  SPENT
+  REFUNDED
+  EXPIRED
+  AWARDED
+}
+
+model Token_transaction {
+  id          String   @id @default(uuid()) @db.Uuid
+  amount      Float
+  type        Transaction_type
+  description String?
+  metadata    Json?
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

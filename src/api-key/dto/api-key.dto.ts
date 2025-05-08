@@ -13,5 +13,6 @@ export class PublicApiKeyDto {
   @IsDateString()
   createdAt: Date
 
+  @IsDateString()
   updatedAt: Date
 }
