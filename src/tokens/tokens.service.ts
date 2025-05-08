@@ -11,11 +11,11 @@ export class TokensService {
     // private readonly transaction: TokenTransactionService,
   ) {}
 
-  async getUserBalance(userId: string): Promise<number> {
+  async getUserBalance(userId: string): Promise<{ amount: number }> {
     await this.user.verifyUser(userId)
 
     const balance = await this.balance.getBalance(userId)
 
-    return balance.amount ?? 0
+    return { amount: balance?.amount ?? 0 }
   }
 }

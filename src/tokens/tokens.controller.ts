@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Request } from '@nestjs/common'
 import { TokensService } from './tokens.service'
 import { AuthGuard } from 'src/auth/auth.guard'
+import { Payload } from '../auth/auth.interface'
 
 @UseGuards(AuthGuard)
 @Controller('tokens')
@@ -8,8 +9,10 @@ export class TokensController {
   constructor(private readonly tokensService: TokensService) {}
 
   @Get('my-balance')
-  getBalance(@Request() req: any) {
-    return 'ypour balance is 100 tokens'
+  async getBalance(@Request() req: { payload: Payload }) {
+    const userId = req.payload.userId
+    const balance = await this.tokensService.getUserBalance(userId)
+    return balance
   }
 
   @Get('transactions-history')

@@ -1,18 +1,21 @@
 import { PrismaService } from 'src/prisma/prisma.service'
 import { TokenBalanceDto } from '../dto/token-balance.dto'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export class TokenBalanceService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getBalance(userId: string): Promise<TokenBalanceDto> {
+  async getBalance(userId: string): Promise<TokenBalanceDto | null> {
     const balance = await this.prisma.token_balance.findMany({
-      where: { userId },
+      where: { id: userId },
       orderBy: { createdAt: 'desc' },
       take: 1,
     })
 
-    if (!balance) {
-      throw new Error('Balance not found')
+    if (!balance[0]) {
+      // throw new Error('Balance not found')
+      return null
     }
 
     return balance[0]
@@ -31,6 +34,9 @@ export class TokenBalanceService {
 
   async updateBalance(userId: string, amount: number): Promise<TokenBalanceDto> {
     const balance = await this.getBalance(userId)
+    if (!balance) {
+      throw new Error('Balance not found')
+    }
     const balance_update = await this.prisma.token_balance.update({
       where: { id: balance.id },
       data: { amount },
