@@ -16,8 +16,10 @@ export class TokensController {
   }
 
   @Get('transactions-history')
-  getTransactions(@Request() req: any) {
-    return 'your transactions'
+  async getTransactions(@Request() req: { payload: Payload }) {
+    const userId = req.payload.userId
+    const transactions = await this.tokensService.getUserTransactions(userId)
+    return transactions
   }
 
   @Post('buy-tokens')
