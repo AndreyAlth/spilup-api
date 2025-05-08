@@ -7,7 +7,7 @@ export class TokenBalanceDto {
 
   @IsNotEmpty()
   @IsNumber()
-  amount: Float32Array
+  amount: number
 
   @IsNotEmpty()
   @IsString()
