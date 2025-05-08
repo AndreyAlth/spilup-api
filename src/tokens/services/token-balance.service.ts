@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { TokenBalanceDto } from '../dto/token-balance.dto'
 
-@Injectable()
 export class TokenBalanceService {
   constructor(private readonly prisma: PrismaService) {}
 

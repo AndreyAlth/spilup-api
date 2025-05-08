@@ -1,26 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTokenDto } from './dto/create-token.dto';
-import { UpdateTokenDto } from './dto/update-token.dto';
+import { Injectable } from '@nestjs/common'
+import { UsersService } from 'src/users/users.service'
+import { TokenBalanceService } from './services/token-balance.service'
+// import { TokenTransactionService } from './services/token-transaction.service'
 
 @Injectable()
 export class TokensService {
-  create(createTokenDto: CreateTokenDto) {
-    return 'This action adds a new token';
-  }
+  constructor(
+    private readonly user: UsersService,
+    private readonly balance: TokenBalanceService,
+    // private readonly transaction: TokenTransactionService,
+  ) {}
 
-  findAll() {
-    return `This action returns all tokens`;
-  }
+  async getUserBalance(userId: string): Promise<number> {
+    await this.user.verifyUser(userId)
 
-  findOne(id: number) {
-    return `This action returns a #${id} token`;
-  }
+    const balance = await this.balance.getBalance(userId)
 
-  update(id: number, updateTokenDto: UpdateTokenDto) {
-    return `This action updates a #${id} token`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} token`;
+    return balance.amount ?? 0
   }
 }

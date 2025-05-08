@@ -1,34 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TokensService } from './tokens.service';
-import { CreateTokenDto } from './dto/create-token.dto';
-import { UpdateTokenDto } from './dto/update-token.dto';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Request } from '@nestjs/common'
+import { TokensService } from './tokens.service'
+import { AuthGuard } from 'src/auth/auth.guard'
 
+@UseGuards(AuthGuard)
 @Controller('tokens')
 export class TokensController {
   constructor(private readonly tokensService: TokensService) {}
 
-  @Post()
-  create(@Body() createTokenDto: CreateTokenDto) {
-    return this.tokensService.create(createTokenDto);
+  @Get('my-balance')
+  getBalance(@Request() req: any) {
+    return 'ypour balance is 100 tokens'
   }
 
-  @Get()
-  findAll() {
-    return this.tokensService.findAll();
+  @Get('transactions-history')
+  getTransactions(@Request() req: any) {
+    return 'your transactions'
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tokensService.findOne(+id);
+  @Post('buy-tokens')
+  generateTokens(@Body() body: any) {
+    return 'your tokens have been generated'
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTokenDto: UpdateTokenDto) {
-    return this.tokensService.update(+id, updateTokenDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tokensService.remove(+id);
+  @Post('burn-tokens')
+  burnTokens(@Body() body: any) {
+    return 'your tokens have been burned'
   }
 }
