@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Request } from '@nestjs/common'
+import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common'
 import { TokensService } from './tokens.service'
 import { AuthGuard } from 'src/auth/auth.guard'
 import { Payload } from '../auth/auth.interface'
@@ -23,8 +23,11 @@ export class TokensController {
   }
 
   @Post('buy-tokens')
-  generateTokens(@Body() body: any) {
-    return 'your tokens have been generated'
+  generateTokens(@Body() body: { amount: number }, @Request() req: { payload: Payload }) {
+    const userId = req.payload.userId
+    const amount = body.amount
+    const tokens = this.tokensService.generateTokens(userId, amount)
+    return tokens
   }
 
   @Post('burn-tokens')

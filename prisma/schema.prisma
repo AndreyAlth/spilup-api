@@ -41,7 +41,7 @@ model Apikey {
 model Token_balance {
   id        String   @id @default(uuid()) @db.Uuid
   amount    Float
-  userId    String   @db.Uuid
+  userId    String   @db.Uuid @unique
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

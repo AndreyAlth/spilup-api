@@ -8,13 +8,15 @@ export class TokenBalanceService {
 
   async getBalance(userId: string): Promise<TokenBalanceDto | null> {
     const balance = await this.prisma.token_balance.findMany({
-      where: { id: userId },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       take: 1,
     })
 
+    console.log(balance)
+
     if (!balance[0]) {
-      // throw new Error('Balance not found')
+      // const newBalance = await this.createBalance(userId, 0)
       return null
     }
 
@@ -68,13 +70,13 @@ export class TokenBalanceService {
     let balance = await this.getBalance(userId)
 
     if (!balance) {
-      balance = await this.createBalance(userId, amount)
+      balance = await this.createBalance(userId, 0)
       return balance
     }
 
     balance = await this.prisma.token_balance.update({
       where: { id: balance.id },
-      data: { amount: balance.amount + amount },
+      data: { amount: amount },
     })
     return balance
   }
