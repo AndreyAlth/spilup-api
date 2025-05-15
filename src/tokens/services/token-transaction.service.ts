@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { Token_transaction } from 'generated/prisma'
+import { Prisma, Token_transaction } from 'generated/prisma'
 import { CreateTokenTransactionDto } from '../dto/create-token-transaction.dto'
 
 @Injectable()
@@ -32,8 +32,12 @@ export class TokenTransactionService {
     return transaction
   }
 
-  async createTransaction(transaction: CreateTokenTransactionDto): Promise<Token_transaction> {
-    const createdTransaction = await this.prisma.token_transaction.create({
+  async createTransaction(
+    transaction: CreateTokenTransactionDto,
+    prismaClient?: Prisma.TransactionClient,
+  ): Promise<Token_transaction> {
+    const client = prismaClient || this.prisma
+    const createdTransaction = await client.token_transaction.create({
       data: transaction,
     })
 

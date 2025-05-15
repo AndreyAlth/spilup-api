@@ -4,6 +4,7 @@ import { TokenBalanceService } from './services/token-balance.service'
 import { TokenTransactionService } from './services/token-transaction.service'
 import { Token_balance, Token_transaction } from 'generated/prisma'
 import { TokenType } from './dto/constants'
+import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class TokensService {
@@ -11,6 +12,7 @@ export class TokensService {
     private readonly user: UsersService,
     private readonly balance: TokenBalanceService,
     private readonly transaction: TokenTransactionService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async getUserBalance(userId: string): Promise<{ amount: number }> {
@@ -32,22 +34,53 @@ export class TokensService {
   async generateTokens(userId: string, amount: number): Promise<Token_balance> {
     await this.user.verifyUser(userId)
 
-    //this must be a transaction
-
-    await this.transaction.createTransaction({
-      userId,
-      amount,
-      type: TokenType.GENERATED,
-      description: 'Tokens generated',
-      metadata: {},
+    const newBalance_data = await this.prisma.$transaction(async (prismaClient) => {
+      await this.transaction.createTransaction(
+        {
+          userId,
+          amount,
+          type: TokenType.GENERATED,
+          description: 'Tokens generated',
+          metadata: {},
+        },
+        prismaClient,
+      )
+      let balance = await this.balance.getBalance(userId, prismaClient)
+      if (!balance) {
+        balance = await this.balance.createBalance(userId, 0, prismaClient)
+        // return new_balance
+      }
+      const newBalance = await this.balance.incrementBalance(userId, balance?.amount + amount, prismaClient)
+      return newBalance
     })
-    let balance = await this.balance.getBalance(userId)
-    if (!balance) {
-      balance = await this.balance.createBalance(userId, 0)
-      // return new_balance
-    }
-    console.log(balance?.amount + amount)
-    const newBalance = await this.balance.incrementBalance(userId, balance?.amount + amount)
-    return newBalance
+
+    return newBalance_data
+  }
+
+  async burnTokens(userId: string, amount: number): Promise<Token_balance> {
+    if (amount < 0) throw new Error('Amount must be greater than 0')
+
+    await this.user.verifyUser(userId)
+
+    const currentBalance = await this.balance.getBalance(userId)
+    if (!currentBalance) throw new Error('Balance not found')
+    if (currentBalance.amount < amount) throw new Error('Not enough balance')
+
+    //burn tokens
+    const newBalance_data = await this.prisma.$transaction(async (prismaClient) => {
+      await this.transaction.createTransaction(
+        {
+          userId,
+          amount: -amount,
+          type: TokenType.BURNED,
+          description: 'Tokens burned',
+          metadata: {},
+        },
+        prismaClient,
+      )
+      const newBalance = await this.balance.decrementBalance(userId, currentBalance.amount - amount, prismaClient)
+      return newBalance
+    })
+    return newBalance_data
   }
 }

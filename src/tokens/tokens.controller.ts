@@ -31,7 +31,10 @@ export class TokensController {
   }
 
   @Post('burn-tokens')
-  burnTokens(@Body() body: any) {
-    return 'your tokens have been burned'
+  burnTokens(@Body() body: { amount: number }, @Request() req: { payload: Payload }) {
+    const userId = req.payload.userId
+    const amount = body.amount
+    const tokens = this.tokensService.burnTokens(userId, amount)
+    return tokens
   }
 }
