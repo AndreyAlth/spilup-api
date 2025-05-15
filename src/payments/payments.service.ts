@@ -1,26 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { Injectable } from '@nestjs/common'
+// import { Customer } from './dto/customer-payment.dto';
+import { Customer, Configuration, CustomersApi, CustomerResponse } from 'conekta'
 
 @Injectable()
 export class PaymentsService {
-  create(createPaymentDto: CreatePaymentDto) {
-    return 'This action adds a new payment';
-  }
+  constructor() {}
 
-  findAll() {
-    return `This action returns all payments`;
-  }
+  conektaApiKey = process.env.CONEKTA_API_KEY
+  config = new Configuration({ accessToken: this.conektaApiKey })
+  client = new CustomersApi(this.config)
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
-  }
-
-  update(id: number, updatePaymentDto: UpdatePaymentDto) {
-    return `This action updates a #${id} payment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} payment`;
+  async createCustomer(customer: Customer): Promise<CustomerResponse | undefined> {
+    try {
+      const response = await this.client.createCustomer(customer).then((response) => {
+        const customerResponse = response.data
+        return customerResponse
+      })
+      return response
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
