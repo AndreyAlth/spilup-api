@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import { ApiKeyModule } from './api-key/api-key.module';
 import { TokensModule } from './tokens/tokens.module';
 import { PaymentsModule } from './payments/payments.module';
-import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [UsersModule, PrismaModule, AuthModule, ApiKeyModule, TokensModule, PaymentsModule],
