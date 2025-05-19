@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Request, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { Auth } from './auth.interface'
 import { UsersService } from 'src/users/users.service'
 import { User } from 'generated/prisma'
 import { Response } from 'express'
 import { AuthGuard } from './auth.guard'
+import { Payload } from '../auth/auth.interface'
 
 @Controller('auth')
 export class AuthController {
@@ -44,8 +45,8 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('me')
-  me() {
-    return 'ruta protegida'
+  @Get('payload')
+  payload(@Request() req: { payload: Payload }) {
+    return req.payload
   }
 }
