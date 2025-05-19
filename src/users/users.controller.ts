@@ -15,9 +15,10 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  findProfile(@Request() req: { payload: Payload }) {
+  async findProfile(@Request() req: { payload: Payload }) {
     const userId = req.payload.userId
-    return this.usersService.findOne(userId)
+    const user = await this.usersService.findOne(userId)
+    return { user }
   }
 
   @UseGuards(AuthGuard)
