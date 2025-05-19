@@ -13,22 +13,17 @@ export class UsersController {
     return this.usersService.create(createUserDto)
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.usersService.findAll();
-  // }
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  findProfile(@Request() req: { payload: Payload }) {
+    const userId = req.payload.userId
+    return this.usersService.findOne(userId)
+  }
 
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id)
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('/profile')
-  findProfile(@Request() req: { payload: Payload }) {
-    const userId = req.payload.userId
-    return this.usersService.findOne(userId)
   }
 
   @UseGuards(AuthGuard)
