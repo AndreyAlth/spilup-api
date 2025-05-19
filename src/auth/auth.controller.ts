@@ -30,8 +30,7 @@ export class AuthController {
       return res.json({ user, token, auth: true })
     } catch (error: unknown) {
       res.status(400).json({
-        message: 'Login failed',
-        error: (error as Error).message,
+        message: (error as Error).message,
       })
       return res
     }
