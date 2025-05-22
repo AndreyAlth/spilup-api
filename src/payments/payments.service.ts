@@ -42,4 +42,42 @@ export class PaymentsService {
       console.log(error)
     }
   }
+
+  async createCheckout(customer: Customer, order: OrderRequest) {
+    console.log(process.env.CONEKTA_API_KEY)
+    try {
+      const customerResponse = await this.createCustomer(customer)
+      if (!customerResponse) throw Error('Error creating order')
+      console.log(customerResponse)
+      // const orderData: OrderRequest = {
+      //   currency: 'MXN',
+      //   customer_info: {
+      //     customer_id: 'ndksndk', // El ID del cliente previamente creado
+      //   },
+      //   line_items: [
+      //     {
+      //       name: '',
+      //       unit_price: 10 * 100, // Conekta espera el precio en centavos
+      //       quantity: 1,
+      //     },
+      //   ],
+      //   charges: [
+      //     {
+      //       payment_method: {
+      //         type: 'card',
+      //         token_id: 'xlmsd', // Token generado en el frontend con Conekta.js
+      //       },
+      //     },
+      //   ],
+      //   checkout: {
+      //     allowed_payment_methods: ['card'],
+      //     expires_at: Math.floor(Date.now() / 1000) + 3600 * 24, // 24 horas de expiración
+      //   },
+      // }
+      // const orderResponse = await this.createOrder(orderData)
+      // return orderResponse
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
