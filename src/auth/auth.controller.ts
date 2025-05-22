@@ -36,12 +36,26 @@ export class AuthController {
       return res
     }
   }
-  @Post('register')
-  register(
+  @Post('sign-up')
+  async register(
     @Body()
     data: User,
+    @Res()
+    res: Response,
   ) {
-    return this.usersService.create(data)
+    try {
+      const new_user = await this.usersService.create(data)
+      if (!new_user) {
+        throw new Error('User not created')
+      }
+      const { user, token } = await this.authService.get_token(new_user.email, new_user.password)
+      return res.json({ user, token, auth: true })
+    } catch (error) {
+      res.status(400).json({
+        message: (error as Error).message,
+      })
+      return res
+    }
   }
 
   @UseGuards(AuthGuard)

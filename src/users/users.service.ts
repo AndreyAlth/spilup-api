@@ -1,16 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
-import { User } from 'generated/prisma'
+import { Prisma, User } from 'generated/prisma'
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUser: User) {
-    // return this.prisma.user.create({
-    //   data: createUser,
-    // });
-    const res = await this.prisma.$queryRaw<User>`
+    try {
+      const res = await this.prisma.$queryRaw<User>`
     INSERT INTO "User" (id, name, "last_name", email, password, "createdAt", "updatedAt")
     VALUES (
       gen_random_uuid(), 
@@ -23,7 +21,13 @@ export class UsersService {
     )
     RETURNING id, name, "last_name", email, "createdAt", "updatedAt"
   `
-    return res
+      return res
+    } catch (error: any) {
+      console.log(error)
+      if (error?.code === '23505') {
+        throw new Error('Email already exists')
+      }
+    }
   }
 
   findAll() {
@@ -55,6 +59,7 @@ export class UsersService {
     })
   }
 
+  //check email vulnerability
   update(id: string, updateUser: User) {
     return this.prisma.user.update({
       where: { id },
@@ -70,8 +75,13 @@ export class UsersService {
     })
   }
 
-  async validatePassword(email: string, password: string): Promise<{ valid: boolean }> {
-    const result = await this.prisma.$queryRaw<{ valid: boolean }[]>`
+  async validatePassword(
+    email: string,
+    password: string,
+    prismaClient?: Prisma.TransactionClient,
+  ): Promise<{ valid: boolean }> {
+    const client = prismaClient || this.prisma
+    const result = await client.$queryRaw<{ valid: boolean }[]>`
       SELECT COUNT(*) > 0 as valid
       FROM "User"
       WHERE email = ${email} AND password = crypt(${password}, password)
@@ -80,8 +90,9 @@ export class UsersService {
     return result[0]
   }
 
-  async findByEmail(email: string): Promise<Omit<User, 'password'> | null> {
-    const user = await this.prisma.user.findUnique({
+  async findByEmail(email: string, prismaClient?: Prisma.TransactionClient): Promise<Omit<User, 'password'> | null> {
+    const client = prismaClient || this.prisma
+    const user = await client.user.findUnique({
       where: { email },
       select: {
         id: true,
@@ -95,8 +106,9 @@ export class UsersService {
     return user
   }
 
-  async verifyUser(userId: string): Promise<Omit<User, 'password'> | null> {
-    const user = await this.prisma.user.findUnique({
+  async verifyUser(userId: string, prismaClient?: Prisma.TransactionClient): Promise<Omit<User, 'password'> | null> {
+    const client = prismaClient || this.prisma
+    const user = await client.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
