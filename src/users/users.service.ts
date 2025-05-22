@@ -6,9 +6,10 @@ import { Prisma, User } from 'generated/prisma'
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUser: User) {
+  async create(createUser: User, prismaClient?: Prisma.TransactionClient): Promise<User | undefined> {
+    const client = prismaClient || this.prisma
     try {
-      const res = await this.prisma.$queryRaw<User>`
+      const res = await client.$queryRaw<User[]>`
     INSERT INTO "User" (id, name, "last_name", email, password, "createdAt", "updatedAt")
     VALUES (
       gen_random_uuid(), 
@@ -19,9 +20,9 @@ export class UsersService {
       NOW(), 
       NOW()
     )
-    RETURNING id, name, "last_name", email, "createdAt", "updatedAt"
+    RETURNING id, name, "last_name", email, password, "createdAt", "updatedAt"
   `
-      return res
+      return res[0]
     } catch (error: any) {
       console.log(error)
       if (error?.code === '23505') {

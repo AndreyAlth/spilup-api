@@ -44,13 +44,10 @@ export class AuthController {
     res: Response,
   ) {
     try {
-      const new_user = await this.usersService.create(data)
-      if (!new_user) {
-        throw new Error('User not created')
-      }
-      const { user, token } = await this.authService.get_token(new_user.email, new_user.password)
-      return res.json({ user, token, auth: true })
+      const { user, auth, token } = await this.authService.signup(data)
+      return res.json({ user, auth, token })
     } catch (error) {
+      console.log(error)
       res.status(400).json({
         message: (error as Error).message,
       })
