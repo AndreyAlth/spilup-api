@@ -7,9 +7,9 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post()
-  create(@Body() body: { customer: Customer; order: any }) {
+  async create(@Body() body: { customer: Customer; order: any }) {
     const { customer, order } = body
-    return this.paymentsService.createCheckout(customer, order)
+    return await this.paymentsService.createCheckout(customer, order)
   }
 
   @Get(':order_id')
