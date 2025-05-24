@@ -43,7 +43,7 @@ export class AuthService {
         expiresIn: '8h',
       },
     )
-    return { user, token: token2 }
+    return { user, token: token2, auth: true, emailVerified: user.emailVerified }
   }
 
   async decode_token(token: string) {
@@ -64,7 +64,7 @@ export class AuthService {
       const new_user = await this.usersService.create(data, prismaClient)
       if (!new_user) throw new Error('User not created')
       const { user, token } = await this.get_token(new_user.email, new_user.password, prismaClient)
-      return { user, token, auth: true }
+      return { user, token, auth: true, emailVerified: user.emailVerified }
     })
     return token_user
   }
