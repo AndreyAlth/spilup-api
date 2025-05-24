@@ -141,4 +141,20 @@ export class UsersService {
     }
     return user
   }
+
+  async updateLastLogin(userId: string, prismaClient?: Prisma.TransactionClient): Promise<void> {
+    const client = prismaClient || this.prisma
+    await client.user.update({
+      where: { id: userId },
+      data: { lastLogin: new Date() },
+    })
+  }
+
+  async updateEmailVerified(userId: string, prismaClient?: Prisma.TransactionClient): Promise<void> {
+    const client = prismaClient || this.prisma
+    await client.user.update({
+      where: { id: userId },
+      data: { emailVerified: new Date() },
+    })
+  }
 }
