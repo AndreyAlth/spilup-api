@@ -14,15 +14,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Providers {
+  EMAIL
+  GOOGLE
+}
+
 //Models
 model User {
   id                 String              @id @default(uuid()) @db.Uuid
   name               String
   last_name          String
   email              String              @unique
+  phone              String              
   password           String
+  provider           Providers
+  emailVerified      DateTime?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  lastLogin          DateTime?
   apiKeys            Apikey[]
   token_balances     Token_balance[]
   token_transactions Token_transaction[]
