@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
-import { Prisma, User } from 'generated/prisma'
+import { Prisma, User, Providers } from 'generated/prisma'
+// import { Providers } from './dto/create-user.dto'
 
 @Injectable()
 export class UsersService {
@@ -10,13 +11,16 @@ export class UsersService {
     const client = prismaClient || this.prisma
     try {
       const res = await client.$queryRaw<User[]>`
-    INSERT INTO "User" (id, name, "last_name", email, password, "createdAt", "updatedAt")
+    INSERT INTO "User" (id, name, "last_name", email, phone, password, "emailVerified", provider, "createdAt", "updatedAt")
     VALUES (
       gen_random_uuid(), 
       ${createUser.name}, 
       ${createUser.last_name}, 
       ${createUser.email}, 
+      ${createUser.phone},
       crypt(${createUser.password}, gen_salt('md5')), 
+      null,
+      ${Providers.EMAIL}::"Providers",
       NOW(), 
       NOW()
     )
@@ -24,7 +28,6 @@ export class UsersService {
   `
       return res[0]
     } catch (error: any) {
-      console.log(error)
       if (error?.code === '23505') {
         throw new Error('Email already exists')
       }
@@ -72,6 +75,10 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        emailVerified: true,
+        phone: true,
+        provider: true,
+        lastLogin: true,
       },
     })
   }
@@ -102,6 +109,10 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        emailVerified: true,
+        phone: true,
+        provider: true,
+        lastLogin: true,
       },
     })
     return user
@@ -118,6 +129,10 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        emailVerified: true,
+        phone: true,
+        provider: true,
+        lastLogin: true,
       },
     })
 

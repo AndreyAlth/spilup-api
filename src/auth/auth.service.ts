@@ -63,7 +63,6 @@ export class AuthService {
     const token_user = await this.prisma.$transaction(async (prismaClient) => {
       const new_user = await this.usersService.create(data, prismaClient)
       if (!new_user) throw new Error('User not created')
-      console.log(new_user.email, new_user.password)
       const { user, token } = await this.get_token(new_user.email, new_user.password, prismaClient)
       return { user, token, auth: true }
     })
