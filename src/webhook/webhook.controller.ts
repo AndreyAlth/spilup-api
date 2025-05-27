@@ -9,7 +9,7 @@ export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 
   @Post('conekta')
-  async handleConektaWebhook(@Body payload: any, @Headers('x-conekta-signature') signature: string) {
+  handleConektaWebhook(@Body payload: any, @Headers('x-conekta-signature') signature: string) {
     this.logger.log('Received Conekta webhook')
     this.logger.debug(`Payload: ${JSON.stringify(payload)}`)
     this.logger.debug(`Signature: ${signature}`)
@@ -21,8 +21,12 @@ export class WebhookController {
         throw new HttpException('Invalid signature', HttpStatus.UNAUTHORIZED)
       }
 
+      const { type, data } = payload
+
+      this.logger.log(`Received webhook: ${type}`)
+
       // Process the webhook event
-      await this.webhookService.processEvent(payload)
+      this.webhookService.processEvent(type, data)
 
       return { status: 'success' }
     } catch (error) {

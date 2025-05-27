@@ -1,26 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { CreateWebhookDto } from './dto/create-webhook.dto';
-import { UpdateWebhookDto } from './dto/update-webhook.dto';
+import { Injectable, Logger } from '@nestjs/common'
+import { OrderResponse } from 'conekta'
 
 @Injectable()
 export class WebhookService {
-  create(createWebhookDto: CreateWebhookDto) {
-    return 'This action adds a new webhook';
+  private readonly logger = new Logger(WebhookService.name)
+
+  constructor() {}
+
+  handleOrderPaid(order: OrderResponse) {
+    this.logger.log(`Processing paid order: ${order.id}`)
+    try {
+      this.logger.log(`Order ${order.id} processed successfully`)
+    } catch (error) {
+      this.logger.error(`Error processing order ${order.id}:`, error)
+      throw error
+    }
   }
 
-  findAll() {
-    return `This action returns all webhook`;
-  }
+  processEvent(type: any, data: any) {
+    switch (type) {
+      case 'order.paid':
+        this.handleOrderPaid(data.object)
+        break
 
-  findOne(id: number) {
-    return `This action returns a #${id} webhook`;
-  }
-
-  update(id: number, updateWebhookDto: UpdateWebhookDto) {
-    return `This action updates a #${id} webhook`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} webhook`;
+      default:
+        this.logger.warn(`Unhandled webhook type: ${type}`)
+        break
+    }
+    return { received: true }
   }
 }
