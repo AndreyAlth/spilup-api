@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt'
 import { jwtConstants } from './constants'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { User, Prisma } from 'generated/prisma'
+import { PublicUser } from 'src/users/dto/user'
 
 @Injectable()
 export class AuthService {
@@ -59,7 +60,7 @@ export class AuthService {
     return jwt.verify(decoded2.token1, user.email)
   }
 
-  async signup(data: User): Promise<{ user: Omit<User, 'password'>; token: string; auth: boolean }> {
+  async signup(data: User): Promise<{ user: PublicUser; token: string; auth: boolean }> {
     const token_user = await this.prisma.$transaction(async (prismaClient) => {
       const new_user = await this.usersService.create(data, prismaClient)
       if (!new_user) throw new Error('User not created')

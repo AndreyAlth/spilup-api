@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { Prisma, User } from 'generated/prisma'
+import { PublicUser } from './dto/user'
 
 @Injectable()
 export class UsersService {
@@ -24,14 +26,13 @@ export class UsersService {
   `
       return res[0]
     } catch (error: any) {
-      console.log(error)
       if (error?.code === '23505') {
         throw new Error('Email already exists')
       }
     }
   }
 
-  findAll() {
+  findAll(): Promise<PublicUser[]> {
     return this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
       select: {
@@ -39,14 +40,17 @@ export class UsersService {
         name: true,
         last_name: true,
         email: true,
-        password: true,
         createdAt: true,
         updatedAt: true,
+        phone: true,
+        provider: true,
+        emailVerified: true,
+        lastLogin: true,
       },
     })
   }
 
-  findOne(id: string) {
+  findOne(id: string): Promise<PublicUser | null> {
     return this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -56,6 +60,10 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        phone: true,
+        provider: true,
+        emailVerified: true,
+        lastLogin: true,
       },
     })
   }
@@ -91,7 +99,7 @@ export class UsersService {
     return result[0]
   }
 
-  async findByEmail(email: string, prismaClient?: Prisma.TransactionClient): Promise<Omit<User, 'password'> | null> {
+  async findByEmail(email: string, prismaClient?: Prisma.TransactionClient): Promise<PublicUser | null> {
     const client = prismaClient || this.prisma
     const user = await client.user.findUnique({
       where: { email },
@@ -102,12 +110,16 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        phone: true,
+        provider: true,
+        emailVerified: true,
+        lastLogin: true,
       },
     })
     return user
   }
 
-  async verifyUser(userId: string, prismaClient?: Prisma.TransactionClient): Promise<Omit<User, 'password'> | null> {
+  async verifyUser(userId: string, prismaClient?: Prisma.TransactionClient): Promise<PublicUser | null> {
     const client = prismaClient || this.prisma
     const user = await client.user.findUnique({
       where: { id: userId },
@@ -118,9 +130,12 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        phone: true,
+        provider: true,
+        emailVerified: true,
+        lastLogin: true,
       },
     })
-
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`)
     }
