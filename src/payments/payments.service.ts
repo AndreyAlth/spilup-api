@@ -59,7 +59,7 @@ export class PaymentsService {
           {
             name: 'tokens',
             unit_price: 20 * 100, // Conekta espera el precio en centavos
-            quantity: 350000,
+            quantity: 10,
           },
         ],
         shipping_lines: [
@@ -71,7 +71,7 @@ export class PaymentsService {
           type: 'HostedPayment',
           success_url: process.env.CONEKTA_URL_SUCCESS,
           failure_url: process.env.CONEKTA_URL_FAILURE,
-          allowed_payment_methods: ['cash', 'card', 'bank_transfer'],
+          allowed_payment_methods: ['cash', 'card'],
           monthly_installments_options: [3, 6, 9, 12, 18],
           expires_at: Math.floor(Date.now() / 1000) + 3600 * 24, // 24 horas
         },
