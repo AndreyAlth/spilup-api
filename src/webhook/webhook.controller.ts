@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Headers, HttpException, HttpStatus, Logger, Raw } from '@nestjs/common'
+import { Controller, Post, Body, Headers, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import { WebhookService } from './webhook.service'
 import * as crypto from 'crypto'
 
@@ -9,7 +9,7 @@ export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 
   @Post('conekta')
-  handleConektaWebhook(@Body payload: any, @Headers('x-conekta-signature') signature: string) {
+  handleConektaWebhook(@Body() payload: any, @Headers('x-conekta-signature') signature: string) {
     this.logger.log('Received Conekta webhook')
     this.logger.debug(`Payload: ${JSON.stringify(payload)}`)
     this.logger.debug(`Signature: ${signature}`)

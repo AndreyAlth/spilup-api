@@ -8,8 +8,6 @@ import { ApiKeyModule } from './api-key/api-key.module';
 import { TokensModule } from './tokens/tokens.module';
 import { PaymentsModule } from './payments/payments.module';
 import { WebhookModule } from './webhook/webhook.module';
-import { WebhookModule } from './webhook/webhook.module';
-import { WebhookModule } from './webhook/webhook.module';
 
 @Module({
   imports: [UsersModule, PrismaModule, AuthModule, ApiKeyModule, TokensModule, PaymentsModule, WebhookModule],
