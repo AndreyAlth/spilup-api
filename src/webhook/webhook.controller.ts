@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Controller, Post, Body, Headers, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import { WebhookService } from './webhook.service'
-import * as crypto from 'crypto'
+import * as NodeRSA from 'node-rsa'
 
-@Controller('webhook')
+@Controller('webhooks')
 export class WebhookController {
   private readonly logger = new Logger(WebhookController.name)
+  private readonly conektaPublicKey = new (NodeRSA as any)(process.env.CONEKTA_WEBHOOK_PUBLIC_KEY ?? '')
 
   constructor(private readonly webhookService: WebhookService) {}
 
   @Post('conekta')
-  handleConektaWebhook(@Body() payload: any, @Headers('x-conekta-signature') signature: string) {
+  handleConektaWebhook(@Body() payload: any, @Headers('digest') signature: string) {
     this.logger.log('Received Conekta webhook')
     this.logger.debug(`Payload: ${JSON.stringify(payload)}`)
     this.logger.debug(`Signature: ${signature}`)
@@ -25,6 +27,8 @@ export class WebhookController {
 
       this.logger.log(`Received webhook: ${type}`)
 
+      console.log('this is your payload', payload)
+
       // Process the webhook event
       this.webhookService.processEvent(type, data)
 
@@ -38,14 +42,19 @@ export class WebhookController {
   private validateSignature(payload: any, signature: string): boolean {
     if (!signature) return false
 
-    const webhookSecret = process.env.CONEKTA_WEBHOOK_SECRET
+    const webhookSecret = process.env.CONEKTA_WEBHOOK_PUBLIC_KEY
     if (!webhookSecret) {
       this.logger.error('CONEKTA_WEBHOOK_SECRET is not set')
       return false
     }
 
-    const expectedSignature = crypto.createHmac('sha256', webhookSecret).update(JSON.stringify(payload)).digest('hex')
+    const isValid: boolean = this.conektaPublicKey.verify(payload, signature, 'utf8', 'base64')
 
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))
+    if (!isValid) {
+      throw new HttpException('Invalid signature', HttpStatus.UNAUTHORIZED)
+    }
+
+    this.logger.log('Signature is valid')
+    return Boolean(isValid)
   }
 }
