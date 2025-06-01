@@ -2,6 +2,7 @@
 import { Controller, Post, Body, Headers, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import { WebhookService } from './webhook.service'
 import * as NodeRSA from 'node-rsa'
+import { WebhookEvent } from './dto/webhook.dto'
 
 @Controller('webhooks')
 export class WebhookController {
@@ -11,7 +12,7 @@ export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 
   @Post('conekta')
-  handleConektaWebhook(@Body() payload: any, @Headers('digest') signature: string) {
+  async handleConektaWebhook(@Body() payload: WebhookEvent, @Headers('digest') signature: string) {
     this.logger.log('Received Conekta webhook')
     this.logger.debug(`Payload: ${JSON.stringify(payload)}`)
     this.logger.debug(`Signature: ${signature}`)
@@ -27,10 +28,14 @@ export class WebhookController {
 
       this.logger.log(`Received webhook: ${type}`)
 
-      console.log('this is your payload', payload)
+      console.log('----------------------------------')
+
+      console.log(data)
+
+      console.log('----------------------------------')
 
       // Process the webhook event
-      this.webhookService.processEvent(type, data)
+      await this.webhookService.processEvent(type, data)
 
       return { status: 'success' }
     } catch (error) {

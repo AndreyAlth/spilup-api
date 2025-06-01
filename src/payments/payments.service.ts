@@ -43,7 +43,7 @@ export class PaymentsService {
     }
   }
 
-  async createCheckout(customer: Customer, order: OrderRequest) {
+  async createCheckout(customer: Customer, order: { amount: number }) {
     try {
       const customerResponse = await this.createCustomer(customer)
       if (!customerResponse) throw Error('Error creating order')
@@ -57,9 +57,9 @@ export class PaymentsService {
         },
         line_items: [
           {
-            name: 'tokens',
+            name: 'Paquete de tokens',
             unit_price: 20 * 100, // Conekta espera el precio en centavos
-            quantity: 10,
+            quantity: order.amount,
           },
         ],
         shipping_lines: [
@@ -76,7 +76,6 @@ export class PaymentsService {
           expires_at: Math.floor(Date.now() / 1000) + 3600 * 24, // 24 horas
         },
       }
-      console.log(orderData)
       const orderResponse = await this.createOrder(orderData)
       return orderResponse
     } catch (error) {
